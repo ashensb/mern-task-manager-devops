@@ -8,7 +8,9 @@ function App() {
   const [description, setDescription] = useState('');
 
   // Backend URL
-  const API_URL = 'http://localhost:5000/api/tasks';
+  //const API_URL = 'http://localhost:5000/api/tasks';
+  // Backend URL
+  const API_URL = 'http://18.213.190.238:5000/api/tasks';
 
   // 1. SHOWS DATABASE TASKS
   const fetchTasks = async () => {
