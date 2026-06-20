@@ -1,18 +1,15 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import TaskForm from './components/TaskForm';
+import TaskItem from './components/TaskItem';
 import './App.css';
 
 function App() {
   const [tasks, setTasks] = useState([]);
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-
-  // Backend URL
-  //const API_URL = 'http://localhost:5000/api/tasks';
-  // Backend URL
+  // API base URL ilastic ip address of the backend server
   const API_URL = 'http://18.213.190.238:5000/api/tasks';
 
-  // 1. SHOWS DATABASE TASKS
+  // 1. FETCH ALL TASKS
   const fetchTasks = async () => {
     try {
       const response = await axios.get(API_URL);
@@ -26,15 +23,10 @@ function App() {
     fetchTasks();
   }, []);
 
-  // 2. ADDS NEW TASK TO DATABASE
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!title) return alert('Please enter a task title!');
-
+  // 2. ADD NEW TASK
+  const handleAddTask = async (title, description) => {
     try {
       await axios.post(API_URL, { title, description });
-      setTitle('');
-      setDescription('');
       fetchTasks();
     } catch (error) {
       console.error("Error adding task:", error);
@@ -42,7 +34,7 @@ function App() {
   };
 
   // 3. DELETE TASK
-  const deleteTask = async (id) => {
+  const handleDeleteTask = async (id) => {
     if (!window.confirm('Are you sure you want to delete this task?')) return;
     try {
       await axios.delete(`${API_URL}/${id}`);
@@ -53,7 +45,7 @@ function App() {
   };
 
   // 4. TOGGLE COMPLETE STATUS
-  const toggleComplete = async (task) => {
+  const handleToggleComplete = async (task) => {
     try {
       await axios.put(`${API_URL}/${task._id}`, { completed: !task.completed });
       fetchTasks();
@@ -72,30 +64,9 @@ function App() {
       </header>
       
       <main>
-        {/* Task Add Form */}
-        <section>
-          <form onSubmit={handleSubmit} className="task-form">
-            <input 
-              type="text" 
-              placeholder="Task Title" 
-              value={title} 
-              onChange={(e) => setTitle(e.target.value)}
-              className="input-field"
-            />
-            <textarea 
-              placeholder="Description (Optional)" 
-              value={description} 
-              onChange={(e) => setDescription(e.target.value)}
-              className="input-field"
-              style={{ minHeight: '100px' }}
-            />
-            <button type="submit" className="submit-btn">
-              Add New Task 
-            </button>
-          </form>
-        </section>
+        {/* Component architecture */}
+        <TaskForm onAddTask={handleAddTask} />
 
-        {/* Current Tasks */}
         <section className="tasks-section">
           <h2>Current Tasks ({tasks.length})</h2>
           <div className="tasks-list">
@@ -105,26 +76,12 @@ function App() {
               </div>
             ) : (
               tasks.map((task) => (
-                <div key={task._id} className={`task-card ${task.completed ? 'completed' : ''}`}>
-                  <div className="task-content">
-                    <h3>{task.title}</h3>
-                    <p>{task.description || 'No description provided.'}</p>
-                  </div>
-                  <div className="task-actions">
-                    <button 
-                      onClick={() => toggleComplete(task)} 
-                      className={`action-btn ${task.completed ? 'undo-btn' : 'complete-btn'}`}
-                    >
-                      {task.completed ? 'Undo' : 'Complete'}
-                    </button>
-                    <button 
-                      onClick={() => deleteTask(task._id)} 
-                      className="action-btn delete-btn"
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </div>
+                <TaskItem 
+                  key={task._id} 
+                  task={task} 
+                  onToggleComplete={handleToggleComplete} 
+                  onDeleteTask={handleDeleteTask} 
+                />
               ))
             )}
           </div>
@@ -133,6 +90,5 @@ function App() {
     </div>
   );
 }
-
 
 export default App;
