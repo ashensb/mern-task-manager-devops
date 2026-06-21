@@ -1,12 +1,11 @@
 name: MERN CI/CD Pipeline
 
-# 💡 කවදා හරි main බ්‍රාන්ච් එකට කෝඩ් එකක් push කරපු ගමන් මේ පයිප්ලයින් එක පණ ගැන්වෙනවා
 on:
   push:
     branches: [ main ]
 
 jobs:
-  #  STAGE 1: Docker Images Build and Push to Docker Hub 
+  #  STAGE 1: Docker Images Build & Push 
   build-and-push:
     runs-on: ubuntu-latest
     steps:
@@ -16,36 +15,36 @@ jobs:
       - name: Login to Docker Hub
         uses: docker/login-action@v2
         with:
-          username: ${{ secrets::DOCKERHUB_USERNAME }}
-          password: ${{ secrets::DOCKERHUB_TOKEN }}
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      # Backend Image build and push
+      # Backend Image Build and Push
       - name: Build and Push Backend
         uses: docker/build-push-action@v4
         with:
           context: ./backend
           push: true
-          tags: ${{ secrets::DOCKERHUB_USERNAME }}/mern-backend:v1
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/mern-backend:v1
 
-      # Frontend Image build and push
+      # Frontend Image Build and Push
       - name: Build and Push Frontend
         uses: docker/build-push-action@v4
         with:
           context: ./frontend
           push: true
-          tags: ${{ secrets::DOCKERHUB_USERNAME }}/mern-frontend:v1
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/mern-frontend:v1
 
-  # STAGE 2: Automated Deployment to AWS EC2 Server
+  #  STAGE 2: AWS Server Auto Deploy 
   deploy:
     runs-on: ubuntu-latest
-    needs: build-and-push           # This job will only run after the build-and-push job is successful
+    needs: build-and-push
     steps:
       - name: SSH into AWS and Deploy
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets::AWS_HOST }}
+          host: ${{ secrets.AWS_HOST }}
           username: ubuntu
-          key: ${{ secrets::AWS_SSH_KEY }}
+          key: ${{ secrets.AWS_SSH_KEY }}
           script: |
             cd ~/mern-task-manager-devops
             git fetch --all
