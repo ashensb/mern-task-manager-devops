@@ -1,14 +1,21 @@
-# Dockerfile for the frontend
-FROM node:20.19.0
-
+# STAGE 1: Build Stage 
+FROM node:20.19.0 AS builder
 WORKDIR /app
 
 COPY package*.json ./
-
 RUN npm install
 
+# Copy the rest of the application code and build the React app
 COPY . .
+RUN npm run build
 
-EXPOSE 3000
+# STAGE 2: Production Stage (Nginx) 
+FROM nginx:stable-alpine
 
-CMD ["npm","run" ,"dev"]
+# Stage 1 build folder recived and copy to nginx html folder
+COPY --from=builder /app/dist /usr/share/nginx/html
+
+# Nginx 80 port  
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]
