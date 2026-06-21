@@ -22,7 +22,7 @@ services:
       - MONGO_URL=mongodb://mongo:27017/test-users
 
   frontend:
-    build: ./frontend
+    image: ashensb/mern-frontend:v1
     container_name: Task_frontend_container
     ports:
       - "80:80"  # Nginx 80 port expoose
