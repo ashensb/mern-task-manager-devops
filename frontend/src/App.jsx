@@ -7,7 +7,7 @@ import './App.css';
 function App() {
   const [tasks, setTasks] = useState([]);
   // API base URL ilastic ip address of the backend server
-  const API_URL = 'http://18.213.190.238:5000/api/tasks';
+  const API_URL = '/api/tasks';
 
   // 1. FETCH ALL TASKS
   const fetchTasks = async () => {

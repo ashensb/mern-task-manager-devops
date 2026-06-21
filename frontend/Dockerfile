@@ -12,6 +12,8 @@ RUN npm run build
 # STAGE 2: Production Stage (Nginx) 
 FROM nginx:stable-alpine
 
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
 # Stage 1 build folder recived and copy to nginx html folder
 COPY --from=builder /app/dist /usr/share/nginx/html
 
