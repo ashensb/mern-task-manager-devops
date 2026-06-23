@@ -8,21 +8,24 @@ services:
     ports:
       - "27017:27017"
 
- backend:
-    image: ashensb/mern-backend:v2
+  backend:
+    build: ./backend
     container_name: Task_backend_container
     ports:
       - "5000:5000"
     depends_on:
       - mongo
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
     environment:
       - MONGO_URL=mongodb://mongo:27017/test-users
 
   frontend:
-    image: ashensb/mern-frontend:v2
+    image: ashensb/mern-frontend:v1
     container_name: Task_frontend_container
     ports:
-      - "80:80"  # Nginx 80 port expose
+      - "80:80"  # Nginx 80 port expoose
     depends_on:
       - backend
    
